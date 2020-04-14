@@ -80,10 +80,22 @@ export function addCourseClasses(classData) {
   };
 }
 
-export function editCourseClasses(classData) {
-  return {
-    type: CONSTANTS.EDIT_COURSE_CLASSES,
-    payload: classData,
+export function editCourseClasses(payload) {
+  return function (dispatch, getState) {
+    return axios
+      .put(
+        `https://www.ekelaas.com/course/set/class/${payload.courseId}/${payload.classIndex}`,
+        {
+          classDate: payload.classDate,
+          classHour: payload.classHour,
+          classParticipants: payload.classParticipants,
+          classNotes: payload.classNotes,
+        },
+        { headers: { "x-auth-token": token } }
+      )
+      .then(() => {
+        dispatch(editTheClassesArray(payload));
+      });
   };
 }
 
@@ -103,16 +115,23 @@ export function deleteCourseClass(payload) {
   };
 }
 
-export function removeFromCourseClasses(classId) {
+export function removeFromCourseClasses(classIndex) {
   return {
     type: CONSTANTS.REMOVE_FROM_COURSE_CLASSES,
-    payload: classId,
+    payload: classIndex,
   };
 }
 
 export function setCourseData(courseData) {
   return {
-    data: CONSTANTS.SET_COURSE_DATA,
+    type: CONSTANTS.SET_COURSE_DATA,
     payload: courseData,
+  };
+}
+
+export function editTheClassesArray(classData) {
+  return {
+    type: CONSTANTS.EDIT_COURSE_CLASSES,
+    payload: classData,
   };
 }

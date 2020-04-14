@@ -26,12 +26,15 @@ export function loginUser(loginData) {
         }
         if (res.data.docUser.types.type === "Student") {
           dispatch(loadStudent(res.data.docUser.types.studentId));
-          dispatch(setType, "Student");
+          dispatch(setType("Student"));
         } else if (res.data.docUser.types.type === "Teacher") {
           dispatch(loadTeacher(res.data.docUser.types.teacherId));
-          dispatch(setType, "Teacher");
+          dispatch(setType("Teacher"));
+        } else if (res.data.docUser.types.type === "Not Set") {
+          dispatch(setType("Not Set"));
         }
         dispatch(setToken(res.data.token));
+        dispatch(setUserLoggedIn(true));
       });
   };
 }
@@ -58,15 +61,15 @@ export function loadUser(userId) {
         if (res.data.userDoc.types.type === "Student") {
           axios.get(
             `https://www.ekelaas.com/student/single/${res.data.userDoc.types.studentId}`
-          );
-          then(({ resStudent }) => {
+          )
+          .then(({ resStudent }) => {
             dispatch(setLoadedStudentData({ res, resStudent }));
           });
         } else if (res.data.userDoc.types.type === "Teacher") {
           axios.get(
             `https://www.ekelaas.com/student/single/${res.data.userDoc.types.teacherId}`
-          );
-          then(({ resTeacher }) => {
+          )
+          .then(({ resTeacher }) => {
             dispatch(setLoadedStudentData({ res, resTeacher }));
           });
         } else if (res.data.userDoc.types.type === "Not Set") {
@@ -163,5 +166,18 @@ export function setToken(token) {
   return {
     type: CONSTANTS.SET_TOKEN,
     payload: token,
+  };
+}
+
+export function setUserLoggedIn(loggedIn) {
+  return {
+    type: CONSTANTS.SET_USER_LOGGED_IN,
+    payload: loggedIn,
+  };
+}
+
+export function logOutUser() {
+  return function (dispatch) {
+    dispatch(setUserLoggedIn(false));
   };
 }

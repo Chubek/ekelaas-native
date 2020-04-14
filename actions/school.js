@@ -25,6 +25,7 @@ export function loginSchool(loginData) {
         dispatch(loadSchoolCourses(res.data.docSchool._id));
         dispatch(loadSchoolTeachers(res.data.docSchool._id));
         dispatch(setSchoolToken(res.data.token));
+        dispatch(setSchoolLoggedIn(true));
       });
   };
 }
@@ -62,7 +63,12 @@ export function loadSchoolStudents(schoolId) {
     return axios
       .get(`https://www.ekelaas.com/school/all/students/${schoolId}`)
       .then(({ res }) => {
-        dispatch(pushToSchoolStudents(res.data.studentDocs));
+        dispatch(
+          pushToSchoolStudents({
+            studentDocs: res.data.studentDocs,
+            userDocs: res.data.userDocs,
+          })
+        );
       });
   };
 }
@@ -82,7 +88,12 @@ export function loadSchoolTeachers(schoolId) {
     return axios
       .get(`https://www.ekelaas.com/school/all/teachers/${schoolId}`)
       .then(({ res }) => {
-        dispatch(pushToSchoolTeachers(res.data.teacherDocs));
+        dispatch(
+          pushToSchoolTeachers({
+            teacherDocs: res.data.teacherDocs,
+            userDocs: res.data.userDocs,
+          })
+        );
       });
   };
 }
@@ -154,5 +165,78 @@ export function setSchoolInfo(schoolInfo) {
   return {
     types: CONSTANTS.SET_SCHOOL_INFO,
     payload: schoolInfo,
+  };
+}
+
+export function setSchoolLoggedIn(loggedIn) {
+  return {
+    type: CONSTANTS.SET_SCHOOL_LOGGED_IN,
+    payload: loggedIn,
+  };
+}
+
+export function logOutSchool() {
+  return function (dispatch) {
+    dispatch(setSchoolLoggedIn(false));
+  };
+}
+
+export function deleteFromSchoolCourses(courseIndex, courseId) {
+  return function (dispatch, getState) {
+    const schoolToken = getState().school.token;
+    return axios
+      .delete(`https://www.ekelaas.com/delete/course/${courseId}`, {
+        headers: { "x-auth-token-school": schoolToken },
+      })
+      .then(() => {
+        dispatch(removeFromSchoolCourses(courseIndex));
+      });
+  };
+}
+
+export function deleteFromSchoolStudents(studentIndex, studentId) {
+  return function (dispatch, getState) {
+    const schoolToken = getState().school.token;
+    return axios
+      .delete(`https://www.ekelaas.com/delete/student/${studentId}`, {
+        headers: { "x-auth-token-school": schoolToken },
+      })
+      .then(() => {
+        dispatch(removeFromSchoolStudents(studentIndex));
+      });
+  };
+}
+
+export function deleteFromSchoolTeachers(teacherIndex, teacherId) {
+  return function (dispatch, getState) {
+    const schoolToken = getState().school.token;
+    return axios
+      .delete(`https://www.ekelaas.com/delete/teacher/${teacherId}`, {
+        headers: { "x-auth-token-school": schoolToken },
+      })
+      .then(() => {
+        dispatch(removeFromSchoolTeachers(teacherIndex));
+      });
+  };
+}
+
+export function removeFromSchoolCourses(courseIndex) {
+  return {
+    type: CONSTANTS.REMOVE_FROM_SCHOOL_COURSES,
+    payload: courseIndex,
+  };
+}
+
+export function removeFromSchoolStudents(studentIndex) {
+  return {
+    type: CONSTANTS.REMOVE_FROM_SCHOOL_STUDENTS,
+    payload: studentIndex,
+  };
+}
+
+export function removeFromSchoolTeachers(teacherIndex) {
+  return {
+    type: CONSTANTS.REMOVE_FROM_SCHOOL_TEACHERS,
+    payload: teacherIndex,
   };
 }

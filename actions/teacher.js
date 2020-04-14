@@ -1,4 +1,5 @@
 import * as CONSTANTS from "../constants";
+import { loadSchool } from "../actions/school";
 
 export function setUpTeacher(teacherData) {
   return function (dispatch, getState) {
@@ -16,7 +17,8 @@ export function setUpTeacher(teacherData) {
       )
       .then(({ res }) => {
         dispatch(setTeacherInfo(teacherData));
-        dispatch(setTeacherData(res.data.teacherDoc))
+        dispatch(setTeacherData(res.data.teacherDoc));
+        dispatch(loadSchool(schoolId));
       });
   };
 }
@@ -50,13 +52,15 @@ export function loadTeacher(teacherId) {
       .get(`https://www.ekelaas.com/teacher/single/${teacherId}`)
       .then(({ res }) => {
         dispatch(setTeacherInfo(res.data.teacherDoc.info));
+        dispatch(setTeacherData(res.data.teacherDoc));
+        dispatch(loadSchool(res.data.teacherDoc.schoolId));
       });
   };
 }
 
 export function setTeacherData(teacherData) {
   return {
-    data: CONSTANTS.SET_TEACHER_DATA,
+    type: CONSTANTS.SET_TEACHER_DATA,
     payload: teacherData,
   };
 }

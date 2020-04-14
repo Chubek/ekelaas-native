@@ -1,4 +1,5 @@
 import * as CONSTANTS from "../constants";
+import { loadSchool } from "../actions/school";
 
 export function setUpStudent(studentData) {
   return function (dispatch, getState) {
@@ -18,6 +19,7 @@ export function setUpStudent(studentData) {
       .then(({ res }) => {
         dispatch(setStudentInfo(studentData));
         dispatch(setStudentData(res.data.studentDOc));
+        dispatch(loadSchool(schoolId));
       });
   };
 }
@@ -51,14 +53,15 @@ export function loadStudent(studentId) {
       .get(`https://www.ekelaas.com/student/single/${studentId}`)
       .then(({ res }) => {
         dispatch(setStudentInfo(res.data.studentDoc.info));
-        dispatch(setStudentData(res.data.studentDOc));
+        dispatch(setStudentData(res.data.studentDoc));
+        dispatch(loadSchool(res.data.studentDoc.schoolId));
       });
   };
 }
 
 export function setStudentData(studentData) {
   return {
-    data: CONSTANTS.SET_STUDENT_DATA,
+    type: CONSTANTS.SET_STUDENT_DATA,
     payload: studentData,
   };
 }
